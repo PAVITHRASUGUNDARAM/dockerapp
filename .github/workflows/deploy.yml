@@ -12,16 +12,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Debug EC2_HOSTS
+      run: echo "EC2 Host is: ${{ secrets.EC2_HOSTS }}"
+
     - name: Setup SSH
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+        ssh-keyscan -H ${{ secrets.EC2_HOSTS }} >> ~/.ssh/known_hosts
 
     - name: Deploy to EC2
       run: |
-        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOSTS }} << 'EOF'
           docker rm -f portfolio || true
           docker rmi portfolio-image || true
           cd ~/app || git clone https://github.com/PAVITHRASUGUNDARAM/dockerapp.git ~/app && cd ~/app
